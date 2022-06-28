@@ -1,5 +1,5 @@
-from django.shortcuts import render
-from django.views.generic import ListView, CreateView, UpdateView, DetailView
+from django.shortcuts import render, redirect
+from django.views.generic import ListView, CreateView, UpdateView, DetailView, DeleteView, View
 from .models import BooksModel
 from .forms import CreateBookForm
 from django.urls import reverse
@@ -53,3 +53,31 @@ class BookDetailView(DetailView):
     model = BooksModel
     template_name = 'main/detail.html'        
 
+class BookDeleteView(DeleteView):
+    model = BooksModel
+    template_name = 'main/delete.html'
+    
+    def get_success_url(self):
+        return reverse('home')
+
+class MainView(View):
+
+    def get(self, request, *args, **kwargs):
+        q = request.GET.get('q')
+        # qs = super().get_queryset()
+        if q:
+            qs = BooksModel.objects.all().filter(name__icontains=q)
+        else:
+            qs = BooksModel.objects.all()   
+        return render(request, 'main/index.html', context={
+            'books': qs,
+            'form': CreateBookForm
+        })
+    
+    def post(self, request, *args, **kwargs):
+        form = CreateBookForm(data=request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('home')
+        else:
+            return redirect('home')    
