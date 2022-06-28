@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.views.generic import ListView, CreateView, UpdateView
+from django.views.generic import ListView, CreateView, UpdateView, DetailView
 from .models import BooksModel
 from .forms import CreateBookForm
 from django.urls import reverse
@@ -46,4 +46,10 @@ class UpdateBookView(UpdateView):
     #     object = BooksModel.objects.get(id=self.kwargs.get('pk'))
     #     return object
     def get_success_url(self):
-        return reverse('create')    
+        return reverse('create') 
+
+
+class BookDetailView(DetailView):
+    model = BooksModel
+    template_name = 'main/detail.html'        
+
